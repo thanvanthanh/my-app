@@ -1,11 +1,10 @@
 //
 //  Release.xcconfig
-//  Base-ios
+//  my-app
 //
 //  Created by Thân Văn Thanh on 30/08/2023.
 
 //// Common Configuration
-#include "./Pods/Target Support Files/Pods-Base-ios/Pods-Base-ios.release.xcconfig"
 #include "config/iOS/xcconfig/Common.xcconfig"
 
 //// App target bundle identifier
@@ -16,7 +15,7 @@ AS_BUNDLE_ID_NOTIFSERV = com.thanhthan.release.ios.notificationservice
 AS_BUNDLE_ID_NOTIFCONTENT = com.thanhthan.release.ios.notificationcontent
 
 /// App Name
-AS_APP_NAME = Base-ios
+AS_APP_NAME = my-app
 /// App Icon
 AS_APP_ICON = AppIcon Release
 /// ProjectEnvironment

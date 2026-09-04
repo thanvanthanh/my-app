@@ -1,11 +1,10 @@
 //
 //  Debug.xcconfig
-//  Base-ios
+//  my-app
 //
 //  Created by Thân Văn Thanh on 30/08/2023.
 
 //// Common Configuration
-#include "./Pods/Target Support Files/Pods-Base-ios/Pods-Base-ios.debug.xcconfig"
 #include "config/iOS/xcconfig/Common.xcconfig"
 
 //// App target bundle identifier
@@ -16,7 +15,7 @@ AS_BUNDLE_ID_NOTIFSERV = com.thanhthan.debug.ios.notificationservice
 AS_BUNDLE_ID_NOTIFCONTENT = com.thanhthan.debug.ios.notificationcontent
 
 /// App Name
-AS_APP_NAME = Base-ios Debug
+AS_APP_NAME = my-app Debug
 /// App Icon
 AS_APP_ICON = AppIcon Debug
 /// ProjectEnvironment

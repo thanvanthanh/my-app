@@ -10,7 +10,6 @@ install:
 # generate
 generate:
 	mint run xcodegen xcodegen generate
-	bundle exec pod install
 
 # swiftgen
 swiftgen:

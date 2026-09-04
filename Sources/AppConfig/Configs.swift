@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class Configs {
+final class Configs: Sendable {
     static let share = Configs()
     
     private init() {}

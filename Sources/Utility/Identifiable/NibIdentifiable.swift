@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 protocol NibIdentifiable: AnyObject {
     static var nib: UINib { get }
 }
@@ -17,6 +18,7 @@ extension NibIdentifiable {
     }
 }
 
+@MainActor
 extension NibIdentifiable where Self: UIView {
     static func initFromNib() -> Self {
         guard let view = nib.instantiate(withOwner: nil, options: nil).first as? Self else { fatalError("Couldn't find nib file for \(self)") }

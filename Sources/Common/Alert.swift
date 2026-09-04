@@ -33,6 +33,7 @@ enum AlertAction {
     }
 }
 
+@MainActor
 class Alert {
     private var alertController: UIAlertController
 

@@ -19,9 +19,9 @@ final class RefreshTokenRequest: BaseAPI<APIRouter>, RefreshTokenRequestable {
     }
 }
 
-class RequestInterceptor: Alamofire.RequestInterceptor {
+final class RequestInterceptor: Alamofire.RequestInterceptor, @unchecked Sendable {
     
-    private var refreshUseCase: RefreshTokenRequest
+    private let refreshUseCase: RefreshTokenRequest
     
     @Atomic private var isRefreshing = false
     

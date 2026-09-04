@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Enviroment {
+enum Enviroment: Sendable {
     case staging
     case production
 }

@@ -11,7 +11,7 @@ import Foundation
 public class LeakDetector {
     
     /// The singleton instance.
-    public static let instance = LeakDetector()
+    public nonisolated(unsafe) static let instance = LeakDetector()
     
     /// The status of leak detection.
     ///

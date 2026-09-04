@@ -11,6 +11,7 @@ import UIKit
 // MARK: - Storyboard Scenes
 
 // swiftlint:disable explicit_type_interface identifier_name line_length type_body_length type_name
+@MainActor
 internal enum StoryboardScene {
   internal enum LaunchScreen: StoryboardType {
     internal static let storyboardName = "LaunchScreen"
@@ -22,6 +23,7 @@ internal enum StoryboardScene {
 
 // MARK: - Implementation Details
 
+@MainActor
 internal protocol StoryboardType {
   static var storyboardName: String { get }
 }
@@ -33,6 +35,7 @@ internal extension StoryboardType {
   }
 }
 
+@MainActor
 internal struct SceneType<T: UIViewController> {
   internal let storyboard: StoryboardType.Type
   internal let identifier: String
@@ -51,6 +54,7 @@ internal struct SceneType<T: UIViewController> {
   }
 }
 
+@MainActor
 internal struct InitialSceneType<T: UIViewController> {
   internal let storyboard: StoryboardType.Type
 

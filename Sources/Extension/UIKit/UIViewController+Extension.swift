@@ -13,17 +13,11 @@ extension UIViewController {
     }
     
     func getRootViewController() -> UIViewController {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return BaseViewController()
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+            return UIViewController()
         }
-
-        if  let rootVC = appDelegate.window?.rootViewController as? BaseViewController {
-            return rootVC
-        }
-        if let rootNav = appDelegate.window?.rootViewController as? UINavigationController, let firstVC = rootNav.viewControllers.first as? BaseViewController {
-            return firstVC
-        }
-        return BaseViewController()
+        return rootVC
     }
     
     static func loadFromNib() -> Self {

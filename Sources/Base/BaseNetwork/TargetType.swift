@@ -8,7 +8,7 @@
 import Foundation
 import Alamofire
 
-enum HTTPMethod: String {
+enum HTTPMethod: String, Sendable {
     case get = "GET"
     case post = "POST"
     case put = "PUT"
@@ -16,7 +16,7 @@ enum HTTPMethod: String {
     case patch = "PATCH"
 }
 
-enum RequestType: Equatable {
+enum RequestType: Equatable, Sendable {
     /// A request with no additional data.
     case requestPath(path: String)
     
@@ -25,15 +25,15 @@ enum RequestType: Equatable {
 }
 
 
-enum Task {
+enum Task: @unchecked Sendable {
     /// A request with no additional data.
     case requestPlain
     
     /// A requests body set with encoded parameters.
-    case requestParameters(parameters: [String: Any], encoding: URLEncoding)
+    case requestParameters(parameters: [String: Any & Sendable], encoding: URLEncoding)
 }
 
-protocol TargetType {
+protocol TargetType: Sendable {
     var baseUrl: String { get }
     var path: RequestType { get }
     var method: HTTPMethod { get }

@@ -46,7 +46,7 @@ platform :ios do
 
   private_lane :deploy_ios do |options|
     # Check if certificates / provisionings are up to date
-    post_slack("[Base-ios #{ENV["TARGET"]} - #{complete_version_number}] Updating iOS certificates")
+    post_slack("[my-app #{ENV["TARGET"]} - #{complete_version_number}] Updating iOS certificates")
     run_match(ENV["BUNDLE_ID_WHATCHAPP"])
     run_match(ENV["BUNDLE_ID_WHATCHEXT"])
     run_match(ENV["BUNDLE_ID_NOTIFSERV"])
@@ -82,9 +82,9 @@ end
 private_lane :deploy do |options|
   import("#{ENV["TARGET"]}/keys_#{options[:env]}")
 
-  post_slack("[Base-ios #{ENV["TARGET"]}] Starting deploy #{options[:env]}...")
+  post_slack("[my-app #{ENV["TARGET"]}] Starting deploy #{options[:env]}...")
   archive_app()
-  post_slack("[Base-ios #{ENV["TARGET"]} - #{complete_version_number}] Finished  #{options[:env]} 🎉")    
+  post_slack("[my-app #{ENV["TARGET"]} - #{complete_version_number}] Finished  #{options[:env]} 🎉")    
 end
 
 private_lane :archive_app do |options|
@@ -95,25 +95,25 @@ private_lane :archive_app do |options|
   disable_automatic_code_signing(path: ENV["XCODEPROJ"])
 
   # Check if certificates / provisionings are up to date
-  post_slack("[Base-ios #{ENV["TARGET"]} - #{complete_version_number}] Updating app certificates")
+  post_slack("[my-app #{ENV["TARGET"]} - #{complete_version_number}] Updating app certificates")
   run_match(ENV["BUNDLE_ID"])
 
   # Build iOS app
-  post_slack("[Base-ios #{ENV["TARGET"]} - #{complete_version_number}] Building...")
+  post_slack("[my-app #{ENV["TARGET"]} - #{complete_version_number}] Building...")
   gym(workspace: ENV["XCWORKSPACE"],
       scheme: ENV["SCHEME"],
       configuration: ENV["CONFIGURATION"],
       export_method: "app-store",
       skip_profile_detection: true,
       output_directory: "./fastlane_output/",
-      output_name: "Base-ios_#{version_number}",
+      output_name: "my-app_#{version_number}",
       clean: true)
 
   # Re-enable Xcode automatic code signing
   enable_automatic_code_signing(path: ENV["XCODEPROJ"])
 
   # Upload to testFligtht
-  post_slack("[Base-ios #{ENV["TARGET"]} - #{complete_version_number}] Uploading to AppStore Connect")
+  post_slack("[my-app #{ENV["TARGET"]} - #{complete_version_number}] Uploading to AppStore Connect")
   pilot(username: ENV["USERNAME"],
         apple_id: ENV["APPLE_ID"],
         app_identifier: ENV["BUNDLE_ID"],
@@ -140,7 +140,7 @@ end
 ### PRIVATE LANES ###
 
 private_lane :prepare_build do |options|
-  post_slack("[Base-ios #{ENV["TARGET"]}] Preparing new build for AppStore Connect")
+  post_slack("[my-app #{ENV["TARGET"]}] Preparing new build for AppStore Connect")
 
   # Installing dependencies
   sh("cd .. && make first_install")

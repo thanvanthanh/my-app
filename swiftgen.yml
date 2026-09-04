@@ -1,12 +1,12 @@
 ##########
-# Base-ios
+# my-app
 ##########
 
 xcassets:
   inputs: [Sources/Supporting Files/Assets iOS.xcassets,
            Sources/Supporting Files/Colors iOS.xcassets]
   outputs:
-    - templateName: swift5
+    - templatePath: config/swiftgen/xcassets-swift6.stencil
       output: Sources/Supporting Files/SwiftGen/Assets.swift
 
 strings:

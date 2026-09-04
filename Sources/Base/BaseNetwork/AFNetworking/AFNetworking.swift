@@ -28,7 +28,9 @@ final class AFNetworking: Alamofire.Session {
             switch status {
             case .notReachable:
                 self.networkEnable = false
-                self.showNetworkFailureAlert()
+                _Concurrency.Task { @MainActor in
+                    self.showNetworkFailureAlert()
+                }
             case .unknown, .reachable:
                 fallthrough
             @unknown default:
@@ -37,6 +39,7 @@ final class AFNetworking: Alamofire.Session {
         }
     }
     
+    @MainActor
     func showNetworkFailureAlert() {
         guard let rootVC = UIApplication.shared.mainKeyWindow?.rootViewController else { return }
         Alert(title: "Can not connect to server.", message: "This may be a temporary failure or a network issue. Please try again later.")

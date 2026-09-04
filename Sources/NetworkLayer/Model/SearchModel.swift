@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ItemSearchResponse: Codable, Identifiable {
+struct ItemSearchResponse: Codable, Sendable {
     var totalCount: Int?
     var items: [SearchModel]?
     
@@ -15,10 +15,9 @@ class ItemSearchResponse: Codable, Identifiable {
         case totalCount = "total_count"
         case items
     }
-    
 }
 
-struct SearchModel: Codable, Identifiable {
+struct SearchModel: Codable, Identifiable, Sendable {
     let id: Int
     let avatarUrl: String
     let htmlUrl: URL

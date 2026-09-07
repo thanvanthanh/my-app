@@ -14,6 +14,12 @@ generate:
 # swiftgen
 swiftgen:
 	mint run swiftgen
+
+# test
+test:
+	xcodebuild -project my-app.xcodeproj -scheme my-app -destination 'platform=iOS Simulator,name=iPhone 17' -skipMacroValidation test CODE_SIGNING_ALLOWED=NO
+
 # open xcode
 open:
 	xed .
+

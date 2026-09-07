@@ -26,56 +26,69 @@ The project follows the **File Separation Pattern**, with screen features kept i
 
 ```
 Sources/
-├── App/
-│   ├── MyApp.swift                      # SwiftUI @main App entry point, initializes root Store
-│   └── AppDelegate.swift                # UIApplicationDelegate (Lifecycle, APNs, Reachability)
+├── App/                                 # App Entry & Navigation Coordination
+│   ├── MyApp.swift                      # SwiftUI @main App entry point, initializes AppCoordinator Store
+│   ├── AppDelegate.swift                # UIApplicationDelegate (Lifecycle, APNs, Reachability)
+│   └── Coordinator/                     # App Coordinator managing app-level navigation flow
+│       ├── Screen.swift                 # Screen enum (@Reducer): search, detail
+│       ├── AppCoordinatorState.swift    # routes: [Route<Screen.State>]
+│       ├── AppCoordinatorAction.swift   # router: IndexedRouterActionOf<Screen>
+│       ├── AppCoordinator.swift         # Handles child delegate actions & pushes via forEachRoute
+│       └── AppCoordinatorView.swift     # TCARouter mapping screens to Views
 │
-├── Features/                            # Feature modules adhering to TCA pattern
-│   ├── Root/                            # Root Coordinator managing screens & navigation flow
-│   │   ├── Screen.swift                 # Screen enum (@Reducer): search, detail
-│   │   ├── RootState.swift              # routes: [Route<Screen.State>]
-│   │   ├── RootAction.swift             # router: IndexedRouterActionOf<Screen>
-│   │   ├── RootReducer.swift            # Handles child delegate actions & pushes via forEachRoute
-│   │   └── RootView.swift               # TCARouter mapping screens to Views
-│   │
+├── Presentation/                        # Presentation Layer (SwiftUI + TCA)
 │   ├── Search/                          # GitHub User Search Feature
 │   │   ├── SearchState.swift            # query, users, isLoading, errorMessage (Hashable)
 │   │   ├── SearchAction.swift           # @CasePathable: view, internal, response, delegate
-│   │   ├── SearchReducer.swift          # Effect.run with ContinuousClock debounce
+│   │   ├── SearchReducer.swift          # Effect.run with ContinuousClock debounce & searchUsersUseCase
 │   │   ├── SearchView.swift             # SwiftUI View: .searchable, List, Refreshable
 │   │   └── Components/
 │   │       ├── UserRowView.swift        # User row item (AsyncImage, avatar, username)
 │   │       └── SearchEmptyView.swift    # Empty, initial, and error state view
 │   │
 │   └── Detail/                          # GitHub User Detail Feature
-│       ├── DetailState.swift            # user: SearchModel (Hashable)
+│       ├── DetailState.swift            # user: User (Hashable)
 │       ├── DetailAction.swift           # @CasePathable: openProfileButtonTapped
 │       ├── DetailReducer.swift          # Handles opening Safari via @Dependency(\.openURL)
 │       └── DetailView.swift             # Profile view with avatar, user ID, profile link
 │
-├── NetworkLayer/
-│   ├── Client/
-│   │   └── SearchClient.swift           # TCA @DependencyClient (async/await, live & mock)
-│   ├── Model/
-│   │   └── SearchModel.swift            # SearchModel & ItemSearchResponse (Sendable)
-│   └── APIRouter.swift                  # API Endpoint definitions
+├── Domain/                              # Domain Layer (Pure Business Logic)
+│   ├── Entities/
+│   │   └── User.swift                   # Pure Domain Entity
+│   ├── Interfaces/
+│   │   └── Repositories/
+│   │       └── UserRepositoryProtocol.swift # Repository contract protocol
+│   └── UseCases/
+│       └── SearchUsersUseCase.swift     # TCA @DependencyClient wrapping business logic
 │
-├── Base/
-│   └── BaseNetwork/
-│       ├── BaseAPI.swift                # Core network layer with fetchDataAsync (async/await)
-│       ├── TargetType.swift             # TargetType, HTTPMethod, Task (Sendable)
-│       └── AFNetworking/                # AFNetworking Session & RequestInterceptor
+├── Data/                                # Data Layer (Repositories & Data Sources)
+│   ├── DTOs/
+│   │   ├── UserDTO.swift                # Decodable GitHub API Model with toDomain() mapper
+│   │   └── ItemSearchResponseDTO.swift  # API search container
+│   └── Repositories/
+│       └── UserRepository.swift         # Concrete implementation of UserRepositoryProtocol
+│
+├── Infrastructure/                      # Infrastructure Layer (Network & External Services)
+│   └── Network/
+│       ├── BaseAPI.swift                # Core network engine (async/await, error body parsing)
+│       ├── TargetType.swift             # HTTPMethod, RequestType, HTTPTask (Encodable & params)
+│       ├── APIRouter.swift              # Endpoint definitions conforming to TargetType
+│       ├── APIError/
+│       │   ├── APIError.swift           # Rich localized error descriptions
+│       │   └── AFError+Extension.swift  # Network connectivity & timeout helpers
+│       ├── AFNetworking/
+│       │   ├── AFNetworking.swift       # Session wrapper & reachability monitoring
+│       │   └── RequestInterceptor.swift # Thread-safe actor-based token refresher (no deadlock)
+│       └── Logger/
+│           └── AlamofireLogger.swift    # Request & response logger
 │
 ├── AppConfig/
 │   ├── Configs.swift                    # Thread-safe Singleton configuration (Sendable)
 │   └── Enviroment.swift                 # App environment enum (Sendable)
 │
-├── Extension/
-│   ├── UIKit/                           # Standard UIKit extensions
-│   └── DataTypeExtension/               # String helpers
-│
-├── Utility/
-│   └── Atomic/                          # Thread-safe property wrapper
+├── Extensions/
+│   ├── UIKit/                           # UIApplication, UIColor extensions
+│   └── Foundation/                      # String extensions
 │
 └── Resources/
     ├── Assets iOS.xcassets              # Image and icon assets
@@ -139,6 +152,7 @@ make all
 | `make install` | Installs Mint packages (`mint bootstrap`) and Ruby gems (`bundle install`) |
 | `make generate` | Regenerates `my-app.xcodeproj` from `project.yml` |
 | `make swiftgen` | Scans assets & strings to generate type-safe Swift code |
+| `make test` | Runs all Unit Tests via Swift Testing on the iOS Simulator |
 | `make open` | Opens the project in Xcode |
 
 ---

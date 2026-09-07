@@ -85,9 +85,19 @@ targets:
       CODE_SIGN_STYLE: "Manual"
       TARGETED_DEVICE_FAMILY: 1
     scheme:
+      testTargets:
+        - my-appTests
       environmentVariables:
         ENABLE_SIGNPOST: YES
-    #postCompileScripts:
-      # swiftlint
-      #- name: ⚠️ Swiftlint
-       # script: mint run swiftlint swiftlint --config .swiftlint.yml
+
+  my-appTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - Tests
+    dependencies:
+      - target: my-app
+    settings:
+      SWIFT_VERSION: "6.0"
+

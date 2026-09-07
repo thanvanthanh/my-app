@@ -12,13 +12,13 @@ import ComposableArchitecture
 struct MyApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-    static let store = Store(initialState: RootState()) {
-        RootFeature()
+    static let store = Store(initialState: AppCoordinatorState()) {
+        AppCoordinator()
     }
 
     var body: some Scene {
         WindowGroup {
-            RootView(store: MyApp.store)
+            AppCoordinatorView(store: MyApp.store)
         }
     }
 }

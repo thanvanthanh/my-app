@@ -15,7 +15,7 @@ public enum AppEnvironment: String, CaseIterable, Sendable {
 
     /// Base URL for API requests
     public var baseURL: String {
-        return "https://" //"https://\(hostName)"
+        return "https://\(hostName)"
     }
 
     /// API Hostname

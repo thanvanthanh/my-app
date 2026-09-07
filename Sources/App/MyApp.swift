@@ -20,6 +20,9 @@ struct MyApp: App {
     var body: some Scene {
         WindowGroup {
             AppCoordinatorView(store: MyApp.store)
+                .appLaunchSplash {
+                    SystemSplashLogo()
+                }
         }
     }
 }

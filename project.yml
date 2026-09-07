@@ -64,7 +64,7 @@ targets:
   my-app:
     type: application
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "18.0"
     sources:
     - Sources
     dependencies:
@@ -97,7 +97,7 @@ targets:
   my-appTests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "18.0"
     sources:
       - Tests
     dependencies:

@@ -9,7 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 
 struct SearchView: View {
-    @Perception.Bindable var store: StoreOf<SearchFeature>
+    @Bindable var store: StoreOf<SearchFeature>
 
     var body: some View {
         List {

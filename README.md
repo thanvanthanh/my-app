@@ -27,10 +27,13 @@ The project follows the **File Separation Pattern**, with screen features kept i
 ```
 Sources/
 ├── App/                                 # App Entry & Navigation Coordination
-│   ├── MyApp.swift                      # SwiftUI @main App entry point, initializes AppCoordinator Store
+│   ├── MyApp.swift                      # SwiftUI @main entry point; wires coordinator and app splash
 │   ├── AppDelegate.swift                # UIApplicationDelegate (Lifecycle, Reachability)
 │   ├── Composition/                     # App-level TCA dependency wiring
-│   │   └── SearchUsersDependency.swift # Live/test SearchUsersUseCase registration
+│   │   └── SearchUsersDependency.swift  # Live/test SearchUsersUseCase registration
+│   ├── LaunchSplash/                    # Animated in-app launch transition
+│   │   ├── AppLaunchSplashConfig.swift  # Timing, color, accessibility, and view modifier
+│   │   └── SystemSplashLogo.swift       # SwiftUI logo shared by the transition
 │   └── Coordinator/                     # App Coordinator managing app-level navigation flow
 │       ├── Screen.swift                 # Screen enum (@Reducer): search, detail
 │       ├── AppCoordinatorState.swift    # routes: [Route<Screen.State>]
@@ -96,7 +99,7 @@ Sources/
     ├── Assets iOS.xcassets              # Image and icon assets
     ├── Colors iOS.xcassets              # Color palette assets
     ├── Localizables/                    # Multilingual strings (en, fr)
-    ├── LaunchScreen.storyboard          # App Launch Screen
+    ├── LaunchScreen.storyboard          # Static system launch screen shown before SwiftUI
     ├── Info.plist                       # Bundle configuration
     └── Swiftgen/                        # Auto-generated code by SwiftGen
 ```

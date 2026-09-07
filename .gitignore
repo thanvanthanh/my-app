@@ -15,6 +15,12 @@ vendor/bundle
 ### apple sign
 *.p8
 *.p12
+scripts/APNs/AuthKey/
+
+### local release configuration
+fastlane/.env
+fastlane/.env.*
+!fastlane/.env.example
 
 
 ## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
@@ -93,4 +99,4 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
-
+fastlane/fastlane_output/

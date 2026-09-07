@@ -10,5 +10,5 @@ import ComposableArchitecture
 
 @ObservableState
 struct DetailState: Equatable, Hashable, Sendable {
-    let user: SearchModel
+    let user: User
 }

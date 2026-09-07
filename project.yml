@@ -39,19 +39,22 @@ settings:
 packages:
   Alamofire:
     url: https://github.com/Alamofire/Alamofire.git
-    from: 5.9.1
+    exactVersion: 5.12.0
   Lottie:
     url: https://github.com/airbnb/lottie-spm.git
-    from: 4.4.3
+    exactVersion: 4.6.1
   SDWebImage:
     url: https://github.com/SDWebImage/SDWebImage.git
-    from: 5.19.0
+    exactVersion: 5.21.7
   ComposableArchitecture:
     url: https://github.com/pointfreeco/swift-composable-architecture
-    from: 1.17.0
+    exactVersion: 1.26.2
   TCACoordinators:
     url: https://github.com/johnpatrickmorgan/TCACoordinators.git
-    from: 0.10.1
+    exactVersion: 0.16.0
+  XCTestDynamicOverlay:
+    url: https://github.com/pointfreeco/xctest-dynamic-overlay
+    exactVersion: 1.13.1
 
 ############
 # Targets
@@ -87,6 +90,7 @@ targets:
     scheme:
       testTargets:
         - my-appTests
+      gatherCoverageData: true
       environmentVariables:
         ENABLE_SIGNPOST: YES
 
@@ -98,6 +102,7 @@ targets:
       - Tests
     dependencies:
       - target: my-app
+      - package: XCTestDynamicOverlay
+        product: IssueReportingTestSupport
     settings:
       SWIFT_VERSION: "6.0"
-

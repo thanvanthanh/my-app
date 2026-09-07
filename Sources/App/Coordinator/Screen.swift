@@ -15,4 +15,3 @@ enum Screen {
 }
 
 extension Screen.State: Hashable, Sendable {}
-

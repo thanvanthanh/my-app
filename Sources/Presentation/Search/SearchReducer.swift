@@ -35,7 +35,10 @@ struct SearchFeature {
                     state.users = []
                     state.errorMessage = nil
                     state.isLoading = false
-                    return .cancel(id: CancelID.search)
+                    return .merge(
+                        .cancel(id: CancelID.search),
+                        .cancel(id: CancelID.debounce)
+                    )
                 }
 
                 // Debounce search with ContinuousClock
@@ -45,8 +48,14 @@ struct SearchFeature {
                 }
                 .cancellable(id: CancelID.debounce, cancelInFlight: true)
 
-            case .searchDebounced, .searchSubmitted, .refreshTriggered:
+            case .searchDebounced:
                 return performSearch(query: state.query, state: &state)
+
+            case .searchSubmitted, .refreshTriggered:
+                return .merge(
+                    .cancel(id: CancelID.debounce),
+                    performSearch(query: state.query, state: &state)
+                )
 
             case let .searchResponse(.success(users)):
                 state.isLoading = false
@@ -82,7 +91,10 @@ struct SearchFeature {
         return .run { [query = trimmed] send in
             do {
                 let users = try await searchUsersUseCase.execute(query)
+                try Task.checkCancellation()
                 await send(.searchResponse(.success(users)))
+            } catch is CancellationError {
+                return
             } catch {
                 await send(.searchResponse(.failure(.message(error.localizedDescription))))
             }

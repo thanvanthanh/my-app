@@ -22,12 +22,31 @@ public struct UserDTO: Codable, Sendable {
 
     public func toDomain() -> User {
         let avatar = avatarUrl.flatMap { URL(string: $0) }
-        let profile = htmlUrl.flatMap { URL(string: $0) } ?? URL(string: "https://github.com/\(login)")!
+        let profile = validatedGitHubProfileURL ?? fallbackGitHubProfileURL
         return User(
             id: id,
             username: login,
             avatarURL: avatar,
             profileURL: profile
         )
+    }
+
+    private var validatedGitHubProfileURL: URL? {
+        guard let htmlUrl,
+              let url = URL(string: htmlUrl),
+              url.scheme?.lowercased() == "https",
+              let host = url.host?.lowercased(),
+              host == "github.com" || host == "www.github.com" else {
+            return nil
+        }
+        return url
+    }
+
+    private var fallbackGitHubProfileURL: URL {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "github.com"
+        components.path = "/\(login)"
+        return components.url ?? URL(fileURLWithPath: "/")
     }
 }

@@ -1,3 +1,7 @@
+.PHONY: all brew-install install generate swiftgen lint test open
+
+TEST_DESTINATION ?= platform=iOS Simulator,name=iPhone 17
+
 all: brew-install install generate swiftgen open
 
 brew-install:
@@ -15,11 +19,14 @@ generate:
 swiftgen:
 	mint run swiftgen
 
+# lint
+lint:
+	mint run swiftlint swiftlint --no-cache Sources Tests
+
 # test
 test:
-	xcodebuild -project my-app.xcodeproj -scheme my-app -destination 'platform=iOS Simulator,name=iPhone 17' -skipMacroValidation test CODE_SIGNING_ALLOWED=NO
+	xcodebuild -project my-app.xcodeproj -scheme my-app -destination '$(TEST_DESTINATION)' -skipMacroValidation -enableCodeCoverage YES test CODE_SIGNING_ALLOWED=NO
 
 # open xcode
 open:
 	xed .
-

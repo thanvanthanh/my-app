@@ -15,19 +15,19 @@ enum SearchAction: Equatable, Sendable {
     case queryChanged(String)
     case searchSubmitted
     case refreshTriggered
-    case userTapped(SearchModel)
+    case userTapped(User)
     
     // Internal actions
     case searchDebounced
     
     // Response actions
-    case searchResponse(Result<[SearchModel], SearchError>)
+    case searchResponse(Result<[User], SearchError>)
     
     // Delegate actions (sent to parent/RootFeature)
     case delegate(Delegate)
     
     enum Delegate: Equatable, Sendable {
-        case userSelected(SearchModel)
+        case userSelected(User)
     }
     
     enum SearchError: LocalizedError, Equatable, Sendable {

@@ -8,28 +8,19 @@
 import Foundation
 import Alamofire
 
-private actor RefreshTokenCoordinator {
-    private var isRefreshing = false
-    private var waiters: [CheckedContinuation<Bool, Never>] = []
+actor RefreshTokenCoordinator {
+    private var refreshTask: Task<Bool, Never>?
 
-    func requestRefresh() async -> Bool {
-        if isRefreshing {
-            // Queue request and await outcome of the existing refresh operation
-            return await withCheckedContinuation { continuation in
-                waiters.append(continuation)
-            }
-        } else {
-            isRefreshing = true
-            return true
+    func refresh(using operation: @escaping @Sendable () async -> Bool) async -> Bool {
+        if let refreshTask {
+            return await refreshTask.value
         }
-    }
 
-    func finishRefresh(success: Bool) {
-        isRefreshing = false
-        for waiter in waiters {
-            waiter.resume(returning: success)
-        }
-        waiters.removeAll()
+        let task = Task { await operation() }
+        refreshTask = task
+        let succeeded = await task.value
+        refreshTask = nil
+        return succeeded
     }
 }
 
@@ -43,8 +34,11 @@ private struct SendableCompletion: @unchecked Sendable {
 
 public final class RequestInterceptor: Alamofire.RequestInterceptor, @unchecked Sendable {
     private let coordinator = RefreshTokenCoordinator()
+    private let refreshOperation: @Sendable () async -> Bool
 
-    public init() {}
+    public init(refreshOperation: @escaping @Sendable () async -> Bool = { false }) {
+        self.refreshOperation = refreshOperation
+    }
 
     public func adapt(
         _ urlRequest: URLRequest,
@@ -60,28 +54,17 @@ public final class RequestInterceptor: Alamofire.RequestInterceptor, @unchecked 
         dueTo error: Error,
         completion: @escaping (RetryResult) -> Void
     ) {
-        guard let response = request.response, response.statusCode == 401 else {
+        guard let response = request.response,
+              response.statusCode == 401,
+              request.retryCount == 0 else {
             completion(.doNotRetry)
             return
         }
 
         let sendableCompletion = SendableCompletion(handler: completion)
         _Concurrency.Task {
-            let shouldPerform = await coordinator.requestRefresh()
-            if shouldPerform {
-                let success = await self.executeTokenRefresh()
-                await coordinator.finishRefresh(success: success)
-                sendableCompletion(success ? .retry : .doNotRetry)
-            } else {
-                // Was queued while another request refreshed
-                sendableCompletion(.retry)
-            }
+            let success = await coordinator.refresh(using: refreshOperation)
+            sendableCompletion(success ? .retry : .doNotRetry)
         }
-    }
-
-    private func executeTokenRefresh() async -> Bool {
-        // Implement token refresh call here (e.g. call auth refresh API)
-        // If successful, update tokens and return true
-        return false
     }
 }

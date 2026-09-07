@@ -11,7 +11,7 @@ import ComposableArchitecture
 @ObservableState
 struct SearchState: Equatable, Hashable, Sendable {
     var query: String = "thanvanthanh"
-    var users: [SearchModel] = []
+    var users: [User] = []
     var isLoading: Bool = false
     var errorMessage: String? = nil
     

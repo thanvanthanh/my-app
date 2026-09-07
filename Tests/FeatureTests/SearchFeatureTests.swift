@@ -126,4 +126,36 @@ struct SearchFeatureTests {
         await store.send(.userTapped(user))
         await store.receive(.delegate(.userSelected(user)))
     }
+
+    @Test
+    func submittingSearchCancelsPendingDebounce() async {
+        let clock = TestClock()
+        let calls = LockIsolated(0)
+
+        let store = TestStore(initialState: SearchState()) {
+            SearchFeature()
+        } withDependencies: {
+            $0.continuousClock = clock
+            $0.searchUsersUseCase.execute = { _ in
+                calls.withValue { $0 += 1 }
+                return []
+            }
+        }
+
+        await store.send(.queryChanged("octocat")) {
+            $0.query = "octocat"
+        }
+        await store.send(.searchSubmitted) {
+            $0.isLoading = true
+            $0.errorMessage = nil
+        }
+        await store.receive(\.searchResponse.success) {
+            $0.isLoading = false
+            $0.users = []
+            $0.errorMessage = nil
+        }
+
+        await clock.advance(by: .milliseconds(400))
+        #expect(calls.value == 1)
+    }
 }

@@ -41,7 +41,7 @@ extension APIRouter: TargetType {
         case let .search(username):
             return .requestParameters(parameters: ["q": username], encoding: .default)
         case let .refreshToken(token):
-            return .requestParameters(parameters: ["refresh_token": token], encoding: .default)
+            return .requestJSONParameters(parameters: ["refresh_token": token])
         }
     }
 

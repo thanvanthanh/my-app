@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UserRowView: View {
-    let user: SearchModel
+    let user: User
 
     var body: some View {
         HStack(spacing: 12) {

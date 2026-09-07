@@ -61,14 +61,11 @@ opt_in_rules:
  - superfluous_disable_command
  - unavailable_function
  - no_fallthrough_only
- - anyobject_protocol
  - redundant_type_annotation
  - collection_alignment
  - identical_operands
  - legacy_random
  - toggle_bool
- - unused_declaration
- - unused_import
  - last_where
  - no_extension_access_modifier
  - nslocalizedstring_key
@@ -98,6 +95,7 @@ opt_in_rules:
 excluded:
  - Carthage
  - Pods
+ - Sources/Resources/Swiftgen
 
 custom_rules:
   swiftgen_assets:

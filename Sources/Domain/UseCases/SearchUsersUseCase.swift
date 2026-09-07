@@ -6,27 +6,19 @@
 //
 
 import Foundation
-import ComposableArchitecture
 
-@DependencyClient
 public struct SearchUsersUseCase: Sendable {
     public var execute: @Sendable (_ query: String) async throws -> [User]
-}
 
-extension DependencyValues {
-    public var searchUsersUseCase: SearchUsersUseCase {
-        get { self[SearchUsersUseCase.self] }
-        set { self[SearchUsersUseCase.self] = newValue }
+    public init(
+        execute: @escaping @Sendable (_ query: String) async throws -> [User]
+    ) {
+        self.execute = execute
     }
-}
 
-extension SearchUsersUseCase: DependencyKey {
-    public static let liveValue = Self(
-        execute: { query in
-            let repository = UserRepository()
-            return try await repository.searchUsers(query: query)
+    public init(repository: any UserRepositoryProtocol) {
+        self.init { query in
+            try await repository.searchUsers(query: query)
         }
-    )
-
-    public static let testValue = Self()
+    }
 }

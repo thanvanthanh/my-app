@@ -10,7 +10,8 @@ import ComposableArchitecture
 
 @main
 struct MyApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @UIApplicationDelegateAdaptor(AppDelegate.self)
+    var appDelegate
 
     static let store = Store(initialState: AppCoordinatorState()) {
         AppCoordinator()

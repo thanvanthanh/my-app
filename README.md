@@ -7,15 +7,15 @@ A modern iOS application built with **SwiftUI**, **The Composable Architecture (
 ## 🛠️ Tech Stack & Architecture
 
 - **UI Framework**: SwiftUI (iOS 16.0+)
-- **Architecture & State Management**: [The Composable Architecture (TCA)](https://github.com/pointfreeco/swift-composable-architecture) v1.26+
+- **Architecture & State Management**: [The Composable Architecture (TCA)](https://github.com/pointfreeco/swift-composable-architecture) 1.26.2
 - **Navigation Flow**: [TCACoordinators](https://github.com/johnpatrickmorgan/TCACoordinators) with isolated screen features and a high-level coordinator (`TCARouter`, `routes`, `forEachRoute`).
 - **Dependency Management**: Swift Package Manager (SPM) integrated directly inside `project.yml`.
 - **Concurrency**: 100% modern Swift Concurrency (`async/await`, `Task`, `Sendable`, `ContinuousClock`).
-- **Project Generator**: [XcodeGen](https://github.com/yonaskolb/XcodeGen) — `.xcodeproj` is never checked into Git.
+- **Project Generator**: [XcodeGen](https://github.com/yonaskolb/XcodeGen) — generated `.xcodeproj` files are not checked into Git.
 - **Code Generation**: [SwiftGen](https://github.com/SwiftGen/SwiftGen) with custom Stencil templates.
 - **CLI Tool Management**: [Mint](https://github.com/yonaskolb/mint).
-- **CI/CD & Automation**: [Fastlane](https://fastlane.tools).
-- **Networking**: [Alamofire](https://github.com/Alamofire/Alamofire) 5.12+ (async/await).
+- **CI/CD & Automation**: GitHub Actions for lint/tests; [Fastlane](https://fastlane.tools) for signed deployments.
+- **Networking**: [Alamofire](https://github.com/Alamofire/Alamofire) 5.12.0 (async/await).
 - **UI Libraries**: [Lottie-SPM](https://github.com/airbnb/lottie-spm), [SDWebImage](https://github.com/SDWebImage/SDWebImage).
 
 ---
@@ -28,7 +28,9 @@ The project follows the **File Separation Pattern**, with screen features kept i
 Sources/
 ├── App/                                 # App Entry & Navigation Coordination
 │   ├── MyApp.swift                      # SwiftUI @main App entry point, initializes AppCoordinator Store
-│   ├── AppDelegate.swift                # UIApplicationDelegate (Lifecycle, APNs, Reachability)
+│   ├── AppDelegate.swift                # UIApplicationDelegate (Lifecycle, Reachability)
+│   ├── Composition/                     # App-level TCA dependency wiring
+│   │   └── SearchUsersDependency.swift # Live/test SearchUsersUseCase registration
 │   └── Coordinator/                     # App Coordinator managing app-level navigation flow
 │       ├── Screen.swift                 # Screen enum (@Reducer): search, detail
 │       ├── AppCoordinatorState.swift    # routes: [Route<Screen.State>]
@@ -59,7 +61,7 @@ Sources/
 │   │   └── Repositories/
 │   │       └── UserRepositoryProtocol.swift # Repository contract protocol
 │   └── UseCases/
-│       └── SearchUsersUseCase.swift     # TCA @DependencyClient wrapping business logic
+│       └── SearchUsersUseCase.swift     # Pure use-case abstraction over repository search
 │
 ├── Data/                                # Data Layer (Repositories & Data Sources)
 │   ├── DTOs/
@@ -84,7 +86,7 @@ Sources/
 │
 ├── AppConfig/
 │   ├── Configs.swift                    # Thread-safe Singleton configuration (Sendable)
-│   └── Enviroment.swift                 # App environment enum (Sendable)
+│   └── AppEnvironment.swift             # App environment enum (Sendable)
 │
 ├── Extensions/
 │   ├── UIKit/                           # UIApplication, UIColor extensions
@@ -104,7 +106,7 @@ Sources/
 ## 📋 Prerequisites
 
 - **macOS**: Sonoma 14.0 or higher
-- **Xcode**: 15.0+ (Xcode 16.0+ recommended)
+- **Xcode**: 16.0+
 - **iOS Deployment Target**: iOS 16.0+
 - **Homebrew**: Installed on your Mac
 - **Mint**: Swift command-line tool manager
@@ -152,6 +154,7 @@ make all
 | `make install` | Installs Mint packages (`mint bootstrap`) and Ruby gems (`bundle install`) |
 | `make generate` | Regenerates `my-app.xcodeproj` from `project.yml` |
 | `make swiftgen` | Scans assets & strings to generate type-safe Swift code |
+| `make lint` | Runs SwiftLint against sources and tests |
 | `make test` | Runs all Unit Tests via Swift Testing on the iOS Simulator |
 | `make open` | Opens the project in Xcode |
 
@@ -172,3 +175,19 @@ Do **not** add packages manually through the Xcode UI since `my-app.xcodeproj` i
 1. Add the Git repository URL and version requirement under `packages:` in [project.yml](project.yml).
 2. Add the product under `dependencies:` for the `my-app` target.
 3. Run `make generate` to regenerate the project.
+
+The package versions in `project.yml` are pinned exactly so local and CI builds resolve the same dependency graph.
+
+### 3. Tests and CI
+
+`make test` collects code coverage. The default simulator can be overridden when needed:
+
+```bash
+make test TEST_DESTINATION='platform=iOS Simulator,OS=latest,name=iPhone 16 Pro'
+```
+
+Pull requests and pushes to `main` or `master` run project generation, SwiftGen, SwiftLint, and tests through `.github/workflows/ci.yml`.
+
+### 4. Release configuration
+
+Fastlane reads credentials and signing configuration from environment variables. Copy `fastlane/.env.example` to the ignored `fastlane/.env` for local use, or configure equivalent encrypted CI secrets. Never commit `.p8`, `.p12`, webhook credentials, or populated environment files.

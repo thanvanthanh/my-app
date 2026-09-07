@@ -1,21 +1,20 @@
 //
 //  RequestInterceptor.swift
-//  mvvm-combine-uikit
+//  my-app
 //
 //  Created by Thân Văn Thanh on 31/08/2023.
 //
 
 import Foundation
 import Alamofire
-import Combine
 
 protocol RefreshTokenRequestable: AnyObject {
-    func refreshToken(_ token: String) -> AnyPublisher<AuthorizeModel?, APIError>
+    func refreshToken(_ token: String) async throws -> AuthorizeModel?
 }
 
 final class RefreshTokenRequest: BaseAPI<APIRouter>, RefreshTokenRequestable {
-    func refreshToken(_ token: String) -> AnyPublisher<AuthorizeModel?, APIError> {
-        self.fetchData(target: .refreshToken(token: token), resonseseType: AuthorizeModel.self)
+    func refreshToken(_ token: String) async throws -> AuthorizeModel? {
+        try await self.fetchDataAsync(target: .refreshToken(token: token))
     }
 }
 
@@ -24,8 +23,6 @@ final class RequestInterceptor: Alamofire.RequestInterceptor, @unchecked Sendabl
     private let refreshUseCase: RefreshTokenRequest
     
     @Atomic private var isRefreshing = false
-    
-    private var disposeBag = DisposeBag()
     
     init(refreshUseCase: RefreshTokenRequest = RefreshTokenRequest(),
          isRefreshing: Bool = false) {
@@ -46,24 +43,22 @@ final class RequestInterceptor: Alamofire.RequestInterceptor, @unchecked Sendabl
         
         if !isRefreshing {
             isRefreshing = true
-            refreshToken()
+            _Concurrency.Task {
+                await refreshToken()
+            }
         }
     }
     
-    private func refreshToken() {
-        refreshUseCase.refreshToken("")
-            .sink { result in
-                switch result {
-                case .finished:
-                    print("finish")
-                case .failure(let error):
-                    print(error)
-                }
-            } receiveValue: { data in
-                if let data = data {
-                    print(data)
-                }
+    private func refreshToken() async {
+        defer { isRefreshing = false }
+        do {
+            let data = try await refreshUseCase.refreshToken("")
+            if let data = data {
+                print("Token refreshed: \(data)")
             }
-            .store(in: disposeBag)
+        } catch {
+            print("Token refresh failed: \(error)")
+        }
     }
 }
+

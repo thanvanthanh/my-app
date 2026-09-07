@@ -3,14 +3,14 @@
 ##########
 
 xcassets:
-  inputs: [Sources/Supporting Files/Assets iOS.xcassets,
-           Sources/Supporting Files/Colors iOS.xcassets]
+  inputs: [Sources/Resources/Assets iOS.xcassets,
+           Sources/Resources/Colors iOS.xcassets]
   outputs:
     - templatePath: config/swiftgen/xcassets-swift6.stencil
-      output: Sources/Supporting Files/SwiftGen/Assets.swift
+      output: Sources/Resources/SwiftGen/Assets.swift
 
 strings:
-  - inputs: Sources/Supporting Files/Localizables/en.lproj
+  - inputs: Sources/Resources/Localizables/en.lproj
     outputs:
         templateName: structured-swift5
-        output: Sources/Supporting Files/SwiftGen/Localizables.swift
+        output: Sources/Resources/SwiftGen/Localizables.swift

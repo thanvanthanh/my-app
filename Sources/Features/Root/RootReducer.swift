@@ -2,11 +2,12 @@
 //  RootReducer.swift
 //  my-app
 //
-//  Created by Antigravity on 04/09/2026.
+//  Created by Thanh Than on 04/09/2026.
 //
 
 import Foundation
 import ComposableArchitecture
+import TCACoordinators
 
 @Reducer
 struct RootFeature {
@@ -14,20 +15,17 @@ struct RootFeature {
     typealias Action = RootAction
 
     var body: some ReducerOf<Self> {
-        Scope(state: \.search, action: \.search) {
-            SearchFeature()
-        }
-
         Reduce { state, action in
             switch action {
-            case let .search(.delegate(.userSelected(user))):
-                state.path.append(.detail(DetailState(user: user)))
+            case let .router(.routeAction(_, .search(.delegate(.userSelected(user))))):
+                state.routes.push(.detail(DetailState(user: user)))
                 return .none
 
-            case .search, .path:
+            case .router:
                 return .none
             }
         }
-        .forEach(\.path, action: \.path)
+        .forEachRoute(\.routes, action: \.router)
     }
 }
+

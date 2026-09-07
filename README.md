@@ -7,38 +7,39 @@ A modern iOS application built with **SwiftUI**, **The Composable Architecture (
 ## 🛠️ Tech Stack & Architecture
 
 - **UI Framework**: SwiftUI (iOS 16.0+)
-- **Architecture & State Management**: [The Composable Architecture (TCA)](https://github.com/pointfreeco/swift-composable-architecture) v1.26+ with a central Root Reducer coordinating navigation and child domains.
+- **Architecture & State Management**: [The Composable Architecture (TCA)](https://github.com/pointfreeco/swift-composable-architecture) v1.26+
+- **Navigation Flow**: [TCACoordinators](https://github.com/johnpatrickmorgan/TCACoordinators) with isolated screen features and a high-level coordinator (`TCARouter`, `routes`, `forEachRoute`).
 - **Dependency Management**: Swift Package Manager (SPM) integrated directly inside `project.yml`.
 - **Concurrency**: 100% modern Swift Concurrency (`async/await`, `Task`, `Sendable`, `ContinuousClock`).
 - **Project Generator**: [XcodeGen](https://github.com/yonaskolb/XcodeGen) — `.xcodeproj` is never checked into Git.
-- **Code Generation**: [SwiftGen](https://github.com/SwiftGen/SwiftGen) with a custom Stencil template compatible with Swift 6 Concurrency.
+- **Code Generation**: [SwiftGen](https://github.com/SwiftGen/SwiftGen) with custom Stencil templates.
 - **CLI Tool Management**: [Mint](https://github.com/yonaskolb/mint).
 - **CI/CD & Automation**: [Fastlane](https://fastlane.tools).
-- **Networking**: [Alamofire](https://github.com/Alamofire/Alamofire) 5.12+ (with async/await support).
+- **Networking**: [Alamofire](https://github.com/Alamofire/Alamofire) 5.12+ (async/await).
 - **UI Libraries**: [Lottie-SPM](https://github.com/airbnb/lottie-spm), [SDWebImage](https://github.com/SDWebImage/SDWebImage).
 
 ---
 
 ## 📁 Project Structure
 
-The project follows the **File Separation Pattern**. Each feature is broken down into granular, focused files (~25 to 80 lines per file) to ensure readability, separation of concerns, and maintainability:
+The project follows the **File Separation Pattern**, with screen features kept isolated and navigation coordinated cleanly:
 
 ```
 Sources/
-├── App Delegate/
+├── App/
 │   ├── MyApp.swift                      # SwiftUI @main App entry point, initializes root Store
-│   ├── AppDelegate.swift                # UIApplicationDelegate (Lifecycle, APNs, Reachability)
-│   └── LaunchScreen.storyboard
+│   └── AppDelegate.swift                # UIApplicationDelegate (Lifecycle, APNs, Reachability)
 │
 ├── Features/                            # Feature modules adhering to TCA pattern
-│   ├── Root/                            # Global Root Reducer coordinating NavigationStack & routes
-│   │   ├── RootState.swift              # StackState<RootPath.State>, RootPath enum
-│   │   ├── RootAction.swift             # @CasePathable: search, path (StackAction)
-│   │   ├── RootReducer.swift            # Orchestrates child delegate actions & push/pop navigation
-│   │   └── RootView.swift               # Global NavigationStack container
+│   ├── Root/                            # Root Coordinator managing screens & navigation flow
+│   │   ├── Screen.swift                 # Screen enum (@Reducer): search, detail
+│   │   ├── RootState.swift              # routes: [Route<Screen.State>]
+│   │   ├── RootAction.swift             # router: IndexedRouterActionOf<Screen>
+│   │   ├── RootReducer.swift            # Handles child delegate actions & pushes via forEachRoute
+│   │   └── RootView.swift               # TCARouter mapping screens to Views
 │   │
 │   ├── Search/                          # GitHub User Search Feature
-│   │   ├── SearchState.swift            # query, users, isLoading, errorMessage
+│   │   ├── SearchState.swift            # query, users, isLoading, errorMessage (Hashable)
 │   │   ├── SearchAction.swift           # @CasePathable: view, internal, response, delegate
 │   │   ├── SearchReducer.swift          # Effect.run with ContinuousClock debounce
 │   │   ├── SearchView.swift             # SwiftUI View: .searchable, List, Refreshable
@@ -47,14 +48,14 @@ Sources/
 │   │       └── SearchEmptyView.swift    # Empty, initial, and error state view
 │   │
 │   └── Detail/                          # GitHub User Detail Feature
-│       ├── DetailState.swift            # user: SearchModel
+│       ├── DetailState.swift            # user: SearchModel (Hashable)
 │       ├── DetailAction.swift           # @CasePathable: openProfileButtonTapped
 │       ├── DetailReducer.swift          # Handles opening Safari via @Dependency(\.openURL)
 │       └── DetailView.swift             # Profile view with avatar, user ID, profile link
 │
 ├── NetworkLayer/
 │   ├── Client/
-│   │   └── SearchClient.swift           # TCA @DependencyClient (async/await, live & mock implementations)
+│   │   └── SearchClient.swift           # TCA @DependencyClient (async/await, live & mock)
 │   ├── Model/
 │   │   └── SearchModel.swift            # SearchModel & ItemSearchResponse (Sendable)
 │   └── APIRouter.swift                  # API Endpoint definitions
@@ -69,8 +70,18 @@ Sources/
 │   ├── Configs.swift                    # Thread-safe Singleton configuration (Sendable)
 │   └── Enviroment.swift                 # App environment enum (Sendable)
 │
-└── Supporting Files/
-    ├── Assets.xcassets                  # Image and color assets
+├── Extension/
+│   ├── UIKit/                           # Standard UIKit extensions
+│   └── DataTypeExtension/               # String helpers
+│
+├── Utility/
+│   └── Atomic/                          # Thread-safe property wrapper
+│
+└── Resources/
+    ├── Assets iOS.xcassets              # Image and icon assets
+    ├── Colors iOS.xcassets              # Color palette assets
+    ├── Localizables/                    # Multilingual strings (en, fr)
+    ├── LaunchScreen.storyboard          # App Launch Screen
     ├── Info.plist                       # Bundle configuration
     └── Swiftgen/                        # Auto-generated code by SwiftGen
 ```

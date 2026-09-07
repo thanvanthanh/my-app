@@ -2,7 +2,7 @@
 //  SearchEmptyView.swift
 //  my-app
 //
-//  Created by Antigravity on 04/09/2026.
+//  Created by Thanh Than on 04/09/2026.
 //
 
 import SwiftUI

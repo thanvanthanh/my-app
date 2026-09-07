@@ -12,7 +12,7 @@ import TCACoordinators
 @ObservableState
 struct AppCoordinatorState: Equatable, Sendable {
     var routes: [Route<Screen.State>] = [
-        .root(.search(SearchState()), withNavigation: true)
+        .root(.welcome(WelcomeFeature.State()), withNavigation: true)
     ]
 }
 

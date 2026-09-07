@@ -15,12 +15,60 @@ import TCACoordinators
 struct AppCoordinatorTests {
 
     @Test
-    func initialRoutesAreConfiguredWithSearch() async {
+    func initialRoutesAreConfiguredWithWelcome() async {
         let store = TestStore(initialState: AppCoordinatorState()) {
             AppCoordinator()
         }
 
-        #expect(store.state.routes == [.root(.search(SearchState()), withNavigation: true)])
+        #expect(store.state.routes == [.root(.welcome(WelcomeFeature.State()), withNavigation: true)])
+    }
+
+    @Test
+    func welcomeContinuesToSearch() async {
+        let store = TestStore(initialState: AppCoordinatorState()) {
+            AppCoordinator()
+        }
+
+        await store.send(.router(.routeAction(id: 0, action: .welcome(.delegate(.continueToApp))))) {
+            $0.routes = [.root(.search(SearchState()), withNavigation: true)]
+        }
+    }
+
+    @Test
+    func welcomeSignInPushesLogin() async {
+        let store = TestStore(initialState: AppCoordinatorState()) {
+            AppCoordinator()
+        }
+
+        await store.send(.router(.routeAction(id: 0, action: .welcome(.delegate(.showLogin))))) {
+            $0.routes.push(.login(LoginFeature.State()))
+        }
+    }
+
+    @Test
+    func loginBackReturnsToWelcome() async {
+        var initialState = AppCoordinatorState()
+        initialState.routes.push(.login(LoginFeature.State()))
+        let store = TestStore(initialState: initialState) {
+            AppCoordinator()
+        }
+
+        await store.send(.router(.routeAction(id: 1, action: .login(.delegate(.dismiss))))) {
+            $0.routes.pop()
+        }
+    }
+
+    @Test
+    func successfulLoginContinuesToSearch() async {
+        var initialState = AppCoordinatorState()
+        initialState.routes.push(.login(LoginFeature.State()))
+        let store = TestStore(initialState: initialState) {
+            AppCoordinator()
+        }
+
+        await store.send(.router(.routeAction(id: 1, action: .login(.delegate(.signedIn))))) {
+            $0.routes = [.root(.search(SearchState()), withNavigation: true)]
+        }
     }
 
     @Test
@@ -32,7 +80,9 @@ struct AppCoordinatorTests {
             login: "thanhthan"
         )
 
-        let store = TestStore(initialState: AppCoordinatorState()) {
+        var initialState = AppCoordinatorState()
+        initialState.routes = [.root(.search(SearchState()), withNavigation: true)]
+        let store = TestStore(initialState: initialState) {
             AppCoordinator()
         }
 

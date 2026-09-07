@@ -10,6 +10,8 @@ import ComposableArchitecture
 
 @Reducer
 enum Screen {
+    case welcome(WelcomeFeature)
+    case login(LoginFeature)
     case search(SearchFeature)
     case detail(DetailFeature)
 }
